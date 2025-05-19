@@ -28,26 +28,23 @@ namespace SentiScanSocialApi.Services
             if (string.IsNullOrEmpty(msgContent))
                 return noDataReturn;
 
-            var positiveWords = new List<string>()
-            {
-                "good",
-                "hello",
-                "hi",
-                "nice"
-            };
+            var positiveWords = new List<string>() { "happy", "good", "great", "awesome" };
 
-            var negativeWords = new List<string>()
-            {
+            var negativeWords = new List<string>() {
                 "bad",
                 "no",
                 "not good",
                 "sad"
             };
 
-            var containsOnlyGoodWords = true;
-            var containsOnlyBadWords = false;
+            var messageWords = msgContent
+                .ToLower()
+                .Split(new[] { ' ', ',', '.', '!', '?', ';', ':' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (containsOnlyGoodWords)
+            var containsGoodWords = positiveWords.Any(word => messageWords.Contains(word.ToLower()));
+            var containsBadWords = negativeWords.Any(word => messageWords.Contains(word.ToLower()));
+
+            if (containsGoodWords && !containsBadWords)
             {
                 return new SentiScanSentiment()
                 {
@@ -56,7 +53,7 @@ namespace SentiScanSocialApi.Services
                 };
             }
 
-            if (containsOnlyBadWords)
+            if (containsBadWords && !containsGoodWords)
             {
                 return new SentiScanSentiment()
                 {
