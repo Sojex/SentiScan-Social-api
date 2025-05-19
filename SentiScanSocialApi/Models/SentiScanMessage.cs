@@ -1,6 +1,6 @@
 ﻿namespace SentiScanSocialApi.Models
 {
-    public class SocialMediaMessage
+    public class SentiScanMessage
     {
         public int Id { get; set; }
         public int? SenderId { get; set; }

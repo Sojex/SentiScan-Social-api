@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SentiScanSocialApi.Interfaces;
 using SentiScanSocialApi.Models;
 
 namespace SentiScanSocialApi.Controllers
@@ -9,59 +10,36 @@ namespace SentiScanSocialApi.Controllers
     {
 
         private readonly ILogger<SentiScanController> _logger;
+        private readonly ISentiScanRepository _sentiScanRepository;
+        private readonly ISentiScanService _sentiScanService;
 
-        public SentiScanController(ILogger<SentiScanController> logger)
+        public SentiScanController(
+            ILogger<SentiScanController> logger, 
+            ISentiScanRepository sentiScanRepository, 
+            ISentiScanService sentiScanService
+        )
         {
             _logger = logger;
+            _sentiScanService = sentiScanService;
+            _sentiScanRepository = sentiScanRepository;
         }
 
         [HttpGet("list-messages")]
-        public IList<SocialMediaMessage> GetLstMessages()
+        public IList<SentiScanMessage> GetLstMessages()
         {
-            var lstMessages = new List<SocialMediaMessage>();
+            var messages = _sentiScanRepository.GetAllSentiScanMessages();
+            return messages;
+        }
 
-            var msg1 = new SocialMediaMessage {
-                Id = 1,
-                MessageContent = "Hey John, how are you doing?",
-                SenderId = 1,
-                ReceiverId = 2,
-            };
-
-            var msg2 = new SocialMediaMessage
-            {
-                Id = 2,
-                MessageContent = "Hey John, how are you doing?",
-                SenderId = 1,
-                ReceiverId = 2,
-            };
-
-            var msg3 = new SocialMediaMessage
-            {
-                Id = 3,
-                MessageContent = "I'm doing alright. What about you?",
-                SenderId = 2,
-                ReceiverId = 1,
-            };
-
-            var msg4 = new SocialMediaMessage
-            {
-                Id = 4,
-                MessageContent = "Ah same old, been busy with work and family.",
-                SenderId = 1,
-                ReceiverId = 2,
-            };
-
-
-            lstMessages.Add(msg1);
-            lstMessages.Add(msg2);
-            lstMessages.Add(msg3);
-            lstMessages.Add(msg4);
-
-            return lstMessages;
+        [HttpPost("calculate-sentiment")]
+        public IActionResult CalculateSentiment(SentiScanMessage sentiScanMessage)
+        {
+            var sentimentResult = _sentiScanService.CalculateSentiment(sentiScanMessage);
+            return Ok(sentimentResult);
         }
 
         [HttpPost("update-message")]
-        public IActionResult UpdateMessage(SocialMediaMessage socialMediaMessage)
+        public IActionResult UpdateMessage(SentiScanMessage sentiScanMessage)
         {
             return Ok(200);
         }
